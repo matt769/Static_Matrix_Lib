@@ -3,6 +3,7 @@
 // * can only take arguments which have matching col/row
 // nice and easy!
 
+// inverse shold check for square matrix
 
 // add setting operationFailure flag
 
@@ -35,7 +36,6 @@ class Matrix {
       T data[NUM_ROWS][NUM_COLS];
       T flat[NUM_ROWS * NUM_COLS];
     };
-
     Matrix();
     void zeroInit();
     void identityInit();
@@ -178,10 +178,10 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
   for (uint8_t pivotPosition = 0; pivotPosition < NUM_ROWS; pivotPosition++) {
     // want to use the row with the highest absolute value in the column of the current pivot
     // this can deal with some situations where the diag value is zero
-    // NOT IMPLEMENTING NOW
+    // NOT IMPLEMENTING YET
 
     // first divide the row by the value at pivot to make pivot = 1
-    float factor = 1.0f / temp.data[pivotPosition][pivotPosition];
+    float factor = 1.0f / (temp.data[pivotPosition][pivotPosition]);
     for (uint8_t j = 0; j < NUM_COLS; j++) {
       temp.data[pivotPosition][j] *= factor;
       result.data[pivotPosition][j] *= factor;  // same operation on result matrix
