@@ -14,8 +14,6 @@
 // could I move non-member back to member now that it works?
 // or move more to non-member (would this be preferable space-wise?)
 
-// pass by const ref
-
 // add maximum size (to prevent errors)?
 
 // optimisation (may not be required for teensy)
@@ -43,8 +41,8 @@ class Matrix {
     void identityInit();
     void customInit(T value);
     Matrix copy();
-    Matrix operator+(Matrix m);
-    Matrix operator-(Matrix m);
+    Matrix operator+(const Matrix& m);
+    Matrix operator-(const Matrix& m);
     Matrix operator*(T scalar);
     Matrix operator+(T scalar);
     Matrix operator-(T scalar);
@@ -98,7 +96,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::copy() {
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator+(Matrix<T, NUM_ROWS, NUM_COLS> m) {
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator+(const Matrix<T, NUM_ROWS, NUM_COLS> &m) {
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   for (uint8_t i = 0; i < NUM_ROWS; i++) {
     for (uint8_t j = 0; j < NUM_COLS; j++) {
@@ -109,7 +107,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator+(Matrix<T,
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator-(Matrix<T, NUM_ROWS, NUM_COLS> m) {
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator-(const Matrix<T, NUM_ROWS, NUM_COLS> &m) {
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   for (uint8_t i = 0; i < NUM_ROWS; i++) {
     for (uint8_t j = 0; j < NUM_COLS; j++) {
@@ -218,7 +216,7 @@ void Matrix<T, NUM_ROWS, NUM_COLS>::print() {
 
 
 // NOT A MEMBER FUNCTION
-template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_RIGHT> Matrix<T, ROWS_LEFT, COLS_RIGHT> operator*(const Matrix<T, ROWS_LEFT, SHARED_DIMENSION> a, const Matrix<T, SHARED_DIMENSION, COLS_RIGHT> b) {
+template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_RIGHT> Matrix<T, ROWS_LEFT, COLS_RIGHT> operator*(const Matrix<T, ROWS_LEFT, SHARED_DIMENSION> & a, const Matrix<T, SHARED_DIMENSION, COLS_RIGHT> & b) {
   Matrix<T, ROWS_LEFT, COLS_RIGHT> result;
   for (uint8_t i = 0; i < ROWS_LEFT; i++) { // each row in destination matrix
     for (uint8_t j = 0; j < COLS_RIGHT; j++) { // each column in destination matrix
