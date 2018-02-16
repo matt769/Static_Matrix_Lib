@@ -3,13 +3,10 @@
 // * can only take arguments which have matching col/row
 // nice and easy!
 
-// inverse shold check for square matrix
+// inverse should check for square matrix
 
 // add setting operationFailure flag
 
-// add flat structure version of the data (can use for some operations)
-
-// it's only non-member functions which require template declaration on the same line
 
 // is it inconsistent to have some as member functions and some not?
 // could I move non-member back to member now that it works?
@@ -220,7 +217,7 @@ template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_
   Matrix<T, ROWS_LEFT, COLS_RIGHT> result;
   for (uint8_t i = 0; i < ROWS_LEFT; i++) { // each row in destination matrix
     for (uint8_t j = 0; j < COLS_RIGHT; j++) { // each column in destination matrix
-      float accumulator = 0.0f;
+      T accumulator = 0;
       for (uint8_t k = 0; k < SHARED_DIMENSION; k++) {
         accumulator += a.data[i][k] * b.data[k][j];
       }

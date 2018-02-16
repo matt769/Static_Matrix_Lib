@@ -1,13 +1,17 @@
 #include "Matrix.h"
 
-// test on arduino and teensy
-// check results and performance
-
 // there is nothing preventing access outside the data area
 // should I overload the accessors()
 
-// all operations here take ~7us on the Teensy
+// all operations here take ~7us on the Teensy 3.5
 // except inverse which is ~14us
+
+// on ATMEGA328P, between 500us and 800us for the below operations
+// except inverse which is ~1400us
+
+// inversion will probably not work well with non floats
+
+// it's only non-member functions which require template declaration on the same line
 
 Matrix<float, 3, 4> A;
 Matrix<float, 3, 4> B;
@@ -34,7 +38,7 @@ void setup() {
   D.print();
 
 
-Serial.println(micros());
+  Serial.println(micros());
   Matrix<float, 3, 4> C = A + B;
   Serial.println(micros());
   C.print();
@@ -63,8 +67,28 @@ Serial.println(micros());
   Matrix<float, 3, 3> Linv;
   Serial.println(micros());
   Linv = L.inverse();
-    Serial.println(micros());
-    Linv.print();
+  Serial.println(micros());
+  Linv.print();
+
+  delay(1000);
+  Matrix<int, 3, 4> M;
+  for (uint8_t i = 0; i < 9; i++) {
+    M.flat[i] = (int)random(-100, 100) / 5.0f;
+  }
+  M.print();
+  Matrix<int, 4, 3> N;
+  for (uint8_t i = 0; i < 9; i++) {
+    N.flat[i] = (int)random(-100, 100) / 5.0f;
+  }
+  N.print();
+  
+  Matrix<int, 3, 3> P;
+  Serial.println(micros());
+  P = M * N;
+  Serial.println(micros());
+  P.print();
+
+
 
 
   // the following should fail to compile
