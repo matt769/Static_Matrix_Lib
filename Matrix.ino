@@ -24,6 +24,11 @@ void setup() {
   I.identityInit();
   I.inverse().print();  // need to add proper check
 
+
+// the following should fail to compile
+//  Matrix<float, 2, 2> J = A + B;  // assigning to incorrect result size
+//  Matrix<float, 3, 2> K = D * B;  // D.cols and B.rows don't match
+
   
 }
 

@@ -1,11 +1,12 @@
 // add basic sense checks on dimensions
-// although compiler should catch many
+// + and - will only take matrices of the same size(class)
+// * can only take arguments which have matching col/row
+// nice and easy!
+
 
 // add setting operationFailure flag
 
 // add flat structure version of the data (can use for some operations)
-
-// change back to bytes
 
 // it's only non-member functions which require template declaration on the same line
 
@@ -15,9 +16,11 @@
 
 // pass by const ref
 
-// operations to add
-// +-/ by scalar
+// add maximum size (to prevent errors)?
 
+// optimisation (may not be required for teensy)
+
+// add way to take initialiser list
 
 
 
@@ -30,7 +33,11 @@ template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 class Matrix {
   public:
     bool operationFailure;
-    T data[NUM_ROWS][NUM_COLS];
+    union {
+      T data[NUM_ROWS][NUM_COLS];
+      T flat[NUM_ROWS * NUM_COLS];
+    };
+
     Matrix();
     void zeroInit();
     void identityInit();
@@ -39,6 +46,9 @@ class Matrix {
     Matrix operator+(Matrix m);
     Matrix operator-(Matrix m);
     Matrix operator*(T scalar);
+    Matrix operator+(T scalar);
+    Matrix operator-(T scalar);
+    Matrix operator/(T scalar);
     Matrix inverse();
     Matrix<T, NUM_COLS, NUM_ROWS> transpose();
     void print();
@@ -52,19 +62,15 @@ Matrix<T, NUM_ROWS, NUM_COLS>::Matrix() {
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 void Matrix<T, NUM_ROWS, NUM_COLS>::customInit(T value) {
-  for (uint8_t i = 0; i < NUM_ROWS; i++) {
-    for (uint8_t j = 0; j < NUM_COLS; j++) {
-      data[i][j] = value;
-    }
+  for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+    flat[i] = value;
   }
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 void Matrix<T, NUM_ROWS, NUM_COLS>::zeroInit() {
-  for (uint8_t i = 0; i < NUM_ROWS; i++) {
-    for (uint8_t j = 0; j < NUM_COLS; j++) {
-      data[i][j] = 0.0f;
-    }
+  for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+    flat[i] = 0.0f;
   }
 }
 
@@ -85,10 +91,8 @@ void  Matrix<T, NUM_ROWS, NUM_COLS>::identityInit() {
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::copy() {
   Matrix<T, NUM_ROWS, NUM_COLS> result;
-  for (uint8_t i = 0; i < NUM_ROWS; i++) {
-    for (uint8_t j = 0; j < NUM_COLS; j++) {
-      result.data[i][j] = data[i][j];
-    }
+  for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+    result.flat[i] = flat[i];
   }
   return result;
 }
@@ -118,10 +122,35 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator-(Matrix<T,
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator*(T scalar) {
   Matrix<T, NUM_ROWS, NUM_COLS> result;
-  for (uint8_t i = 0; i < NUM_ROWS; i++) {
-    for (uint8_t j = 0; j < NUM_COLS; j++) {
-      result.data[i][j] = data[i][j] * scalar;
-    }
+  for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+    result.flat[i] = flat[i] * scalar;
+  }
+  return result;
+}
+
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator+(T scalar) {
+  Matrix<T, NUM_ROWS, NUM_COLS> result;
+  for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+    result.flat[i] = flat[i] + scalar;
+  }
+  return result;
+}
+
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator-(T scalar) {
+  Matrix<T, NUM_ROWS, NUM_COLS> result;
+  for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+    result.flat[i] = flat[i] - scalar;
+  }
+  return result;
+}
+
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator/(T scalar) {
+  Matrix<T, NUM_ROWS, NUM_COLS> result;
+  for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+    result.flat[i] = flat[i] / scalar;
   }
   return result;
 }
