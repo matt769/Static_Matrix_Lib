@@ -3,11 +3,6 @@
 // * can only take arguments which have matching col/row
 // nice and easy!
 
-// inverse should check for square matrix
-
-// add setting operationFailure flag
-
-
 // is it inconsistent to have some as member functions and some not?
 // could I move non-member back to member now that it works?
 // or move more to non-member (would this be preferable space-wise?)
@@ -18,7 +13,7 @@
 
 // add way to take initialiser list
 
-
+// try creating some const matrices
 
 #ifndef MATRIX_H
 #define MATRIX_H
@@ -28,16 +23,11 @@
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 class Matrix {
   public:
-    bool operationFailure;
-    union {
-      T data[NUM_ROWS][NUM_COLS];
-      T flat[NUM_ROWS * NUM_COLS];
-    };
     Matrix();
     void zeroInit();
     void identityInit();
-    void customInit(T value);
     Matrix copy();
+    T& operator()(uint8_t row, uint8_t col);
     Matrix operator+(const Matrix& m);
     Matrix operator-(const Matrix& m);
     Matrix operator*(T scalar);
@@ -47,19 +37,21 @@ class Matrix {
     Matrix inverse();
     Matrix<T, NUM_COLS, NUM_ROWS> transpose();
     void print();
+
+  private:
+    bool operationFailure;
+    union {
+      T data[NUM_ROWS][NUM_COLS];
+      T flat[NUM_ROWS * NUM_COLS];
+    };
+    T boundsError;
 };
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS>::Matrix() {
   zeroInit();
   operationFailure = false;
-}
-
-template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-void Matrix<T, NUM_ROWS, NUM_COLS>::customInit(T value) {
-  for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
-    flat[i] = value;
-  }
+  boundsError = -1;
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
@@ -90,6 +82,16 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::copy() {
     result.flat[i] = flat[i];
   }
   return result;
+}
+
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(uint8_t row, uint8_t col) {
+  if (row < NUM_ROWS && col < NUM_COLS) {
+    return data[row][col];
+  }
+  else {
+    return boundsError;
+  }
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
@@ -161,33 +163,43 @@ Matrix<T, NUM_COLS, NUM_ROWS> Matrix<T, NUM_ROWS, NUM_COLS>::transpose() {
   return result;
 }
 
-// add setting of operationFailure flag
-// skip operations that will be on values known to be zero
-// only operates on square matrix
+// Gauss-Jordan method
+// for each column, make diagonal element 1, then makes the rest of the column zero
+// only operates on square matrix (will return zero matrix in size of original if not)
+// ideally make this enforced by the compiler
+// Need to add row swapping
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
-  // will only operate on a square matrix
-  // for each column, make diagonal element 1, then make ret of column zero
 
   Matrix<T, NUM_ROWS, NUM_COLS> result;
+  if (NUM_ROWS != NUM_COLS) {
+    operationFailure = true;
+    return result;
+  }
+
   result.identityInit();
   Matrix<T, NUM_ROWS, NUM_COLS> temp = copy(); // not going to modify original matrix
   for (uint8_t pivotPosition = 0; pivotPosition < NUM_ROWS; pivotPosition++) {
     // want to use the row with the highest absolute value in the column of the current pivot
-    // this can deal with some situations where the diag value is zero
-    // NOT IMPLEMENTING YET
+    // this can help with numerical stability (avoiding under/overflow)
+    // TODO...
 
     // first divide the row by the value at pivot to make pivot = 1
-    float factor = 1.0f / (temp.data[pivotPosition][pivotPosition]);
+    if (temp.data[pivotPosition][pivotPosition] == 0) {
+      operationFailure = true;
+      return result;
+    }
+    T factor = (T)1 / (temp.data[pivotPosition][pivotPosition]);
     for (uint8_t j = 0; j < NUM_COLS; j++) {
       temp.data[pivotPosition][j] *= factor;
       result.data[pivotPosition][j] *= factor;  // same operation on result matrix
     }
     // now for each row k (that isn't the pivot row)
+    // remove the multiple of the current pivot row that will make the element in the pivot column zero
     for (uint8_t rowToZero = 0; rowToZero < NUM_ROWS; rowToZero++) {
       if (rowToZero != pivotPosition) {
-        // minus (pivot row * [k][pivotPosition]
-        float rowFactor = temp.data[rowToZero][pivotPosition];
+        // minus (pivot row * [k][pivotPosition])
+        T rowFactor = temp.data[rowToZero][pivotPosition];
         for (uint8_t j = 0; j < NUM_COLS; j++) {
           temp.data[rowToZero][j] -= temp.data[pivotPosition][j] * rowFactor;
           result.data[rowToZero][j] -= result.data[pivotPosition][j] * rowFactor;  // same operation on result matrix
@@ -219,9 +231,9 @@ template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_
     for (uint8_t j = 0; j < COLS_RIGHT; j++) { // each column in destination matrix
       T accumulator = 0;
       for (uint8_t k = 0; k < SHARED_DIMENSION; k++) {
-        accumulator += a.data[i][k] * b.data[k][j];
+        accumulator += a(i,k) * b(k,j);
       }
-      result.data[i][j] = accumulator;
+      result(i,j) = accumulator;
     }
   }
   return result;

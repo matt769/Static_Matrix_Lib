@@ -13,6 +13,12 @@
 
 // it's only non-member functions which require template declaration on the same line
 
+// suggestions? including file structure e.g. just .h file?
+
+// is the bounds checking approach ok? any alternatives?
+
+// explicitly add dimensions as member variables?
+
 Matrix<float, 3, 4> A;
 Matrix<float, 3, 4> B;
 Matrix<float, 4, 2> D;
@@ -22,18 +28,24 @@ void setup() {
   delay(2000);
   randomSeed(0);
 
-  for (uint8_t i = 0; i < 12; i++) {
-    A.flat[i] = random(-100, 100) / 5.0f;
+  for (uint8_t i = 0; i < 3; i++) {
+    for (uint8_t j = 0; j < 4; j++) {
+      A(i, j) = random(-100, 100) / 5.0f;
+    }
   }
   A.print();
 
-  for (uint8_t i = 0; i < 12; i++) {
-    B.flat[i] = random(-100, 100) / 5.0f;
+  for (uint8_t i = 0; i < 3; i++) {
+    for (uint8_t j = 0; j < 4; j++) {
+      B(i, j) = random(-100, 100) / 5.0f;
+    }
   }
   B.print();
 
-  for (uint8_t i = 0; i < 8; i++) {
-    D.flat[i] = random(-100, 100) / 5.0f;
+  for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t j = 0; j < 2; j++) {
+      D(i, j) = random(-100, 100) / 5.0f;
+    }
   }
   D.print();
 
@@ -60,8 +72,10 @@ void setup() {
   H.print();
 
   Matrix<float, 3, 3> L;
-  for (uint8_t i = 0; i < 9; i++) {
-    L.flat[i] = random(-100, 100) / 5.0f;
+  for (uint8_t i = 0; i < 3; i++) {
+    for (uint8_t j = 0; j < 3; j++) {
+      L(i, j) = random(-100, 100) / 5.0f;
+    }
   }
   L.print();
   Matrix<float, 3, 3> Linv;
@@ -72,23 +86,37 @@ void setup() {
 
   delay(1000);
   Matrix<int, 3, 4> M;
-  for (uint8_t i = 0; i < 9; i++) {
-    M.flat[i] = (int)random(-100, 100) / 5.0f;
+  for (uint8_t i = 0; i < 3; i++) {
+    for (uint8_t j = 0; j < 4; j++) {
+      M(i, j) = (int)random(-100, 100) / 5.0f;
+    }
   }
   M.print();
   Matrix<int, 4, 3> N;
-  for (uint8_t i = 0; i < 9; i++) {
-    N.flat[i] = (int)random(-100, 100) / 5.0f;
+  for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t j = 0; j < 3; j++) {
+      N(i, j) = (int)random(-100, 100) / 5.0f;
+    }
   }
   N.print();
-  
+
   Matrix<int, 3, 3> P;
   Serial.println(micros());
   P = M * N;
   Serial.println(micros());
   P.print();
 
+  Matrix<float, 4, 3> Q;
+  for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t j = 0; j < 3; j++) {
+      Q(i, j) = random(-100, 100) / 5.0f;
+    }
+  }
+  Q.print();
 
+  Serial.println(Q(0, 2));
+  Serial.println(Q(3, 2));
+  Serial.println(Q(40, 50));
 
 
   // the following should fail to compile
