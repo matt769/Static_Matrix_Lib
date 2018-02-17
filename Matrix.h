@@ -20,6 +20,9 @@
 
 #include <Arduino.h>
 
+#define MATRIX_INDEX_OUT_OF_RANGE 1
+#define MATRIX_INVERSION_FAILURE 2
+
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 class Matrix {
   public:
@@ -36,10 +39,11 @@ class Matrix {
     Matrix operator/(T scalar);
     Matrix inverse();
     Matrix<T, NUM_COLS, NUM_ROWS> transpose();
+    uint8_t getErrorStatus();
     void print();
 
   private:
-    bool operationFailure;
+    uint8_t operationFailure;
     union {
       T data[NUM_ROWS][NUM_COLS];
       T flat[NUM_ROWS * NUM_COLS];
@@ -90,6 +94,7 @@ T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(uint8_t row, uint8_t col) {
     return data[row][col];
   }
   else {
+    operationFailure |= MATRIX_INDEX_OUT_OF_RANGE;
     return boundsError;
   }
 }
@@ -173,7 +178,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
 
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   if (NUM_ROWS != NUM_COLS) {
-    operationFailure = true;
+    operationFailure |= MATRIX_INVERSION_FAILURE;
     return result;
   }
 
@@ -222,6 +227,10 @@ void Matrix<T, NUM_ROWS, NUM_COLS>::print() {
   Serial.print('\n');
 }
 
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+uint8_t Matrix<T, NUM_ROWS, NUM_COLS>::getErrorStatus() {
+  return operationFailure;
+}
 
 
 // NOT A MEMBER FUNCTION

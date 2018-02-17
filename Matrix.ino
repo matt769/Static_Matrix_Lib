@@ -19,6 +19,9 @@
 
 // explicitly add dimensions as member variables?
 
+// note that the failure flag does not get reset (more for debugging purposes)
+// could populate with different values
+
 Matrix<float, 3, 4> A;
 Matrix<float, 3, 4> B;
 Matrix<float, 4, 2> D;
@@ -117,6 +120,12 @@ void setup() {
   Serial.println(Q(0, 2));
   Serial.println(Q(3, 2));
   Serial.println(Q(40, 50));
+
+  Serial.println(M.getErrorStatus());
+  M(7,7) = 10;
+  Serial.println(M.getErrorStatus());
+  M.inverse();
+  Serial.println(M.getErrorStatus());
 
 
   // the following should fail to compile
