@@ -1,20 +1,3 @@
-// add basic sense checks on dimensions
-// + and - will only take matrices of the same size(class)
-// * can only take arguments which have matching col/row
-// nice and easy!
-
-// is it inconsistent to have some as member functions and some not?
-// could I move non-member back to member now that it works?
-// or move more to non-member (would this be preferable space-wise?)
-
-// add maximum size (to prevent errors)?
-
-// optimisation (may not be required for teensy)
-
-// add way to take initialiser list
-
-// try creating some const matrices
-
 #ifndef MATRIX_H
 #define MATRIX_H
 
@@ -38,6 +21,7 @@ class Matrix {
     Matrix operator-(T scalar);
     Matrix operator/(T scalar);
     Matrix inverse();
+    Matrix inverseNEW();
     Matrix<T, NUM_COLS, NUM_ROWS> transpose();
     uint8_t getErrorStatus();
     void print();
@@ -162,7 +146,7 @@ Matrix<T, NUM_COLS, NUM_ROWS> Matrix<T, NUM_ROWS, NUM_COLS>::transpose() {
   Matrix<T, NUM_COLS, NUM_ROWS> result;
   for (uint8_t i = 0; i < NUM_ROWS; i++) {
     for (uint8_t j = 0; j < NUM_COLS; j++) {
-      result.data[j][i] = data[i][j];
+      result(j, i) = data[i][j];
     }
   }
   return result;
@@ -216,11 +200,93 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
 }
 
 
+
+
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverseNEW() {
+
+  Matrix<T, NUM_ROWS, NUM_COLS> result;
+  if (NUM_ROWS != NUM_COLS) {
+    operationFailure |= MATRIX_INVERSION_FAILURE;
+    return result;
+  }
+
+  result.identityInit();
+  Matrix<T, NUM_ROWS, NUM_COLS> temp = copy(); // not going to modify original matrix
+  uint8_t rowSwaps[NUM_ROWS];
+  T tempSwapValue;
+  for (uint8_t pivotPosition = 0; pivotPosition < NUM_ROWS; pivotPosition++) {
+    // want to use the row with the highest absolute value in the column of the current pivot
+    // this can help with numerical stability (avoiding under/overflow)
+    uint8_t rowWithMaxValue = pivotPosition;
+    T maxAbsValue = abs(temp.data[pivotPosition][pivotPosition]);
+    for (uint8_t i = 0; i < NUM_ROWS; i++) {
+      if (i != pivotPosition) {
+        if (abs(temp.data[i][pivotPosition]) > maxAbsValue) {
+          rowWithMaxValue = i;
+          maxAbsValue = abs(temp.data[i][pivotPosition]);
+        }
+      }
+    }
+    if (rowWithMaxValue != pivotPosition) {
+      // need to swap rows
+      for (uint8_t j = 0; j < NUM_COLS; j++) {
+        tempSwapValue = temp.data[rowWithMaxValue][j];
+        temp.data[rowWithMaxValue][j] = temp.data[pivotPosition][j];
+        temp.data[pivotPosition][j] = tempSwapValue;
+        tempSwapValue = result.data[rowWithMaxValue][j];
+        result.data[rowWithMaxValue][j] = result.data[pivotPosition][j];
+        result.data[pivotPosition][j] = tempSwapValue;
+      }
+    }
+    rowSwaps[pivotPosition] = rowWithMaxValue;
+
+    // first divide the row by the value at pivot to make pivot = 1
+    if (temp.data[pivotPosition][pivotPosition] == 0) {
+      operationFailure = true;
+      return result;
+    }
+    T factor = (T)1 / (temp.data[pivotPosition][pivotPosition]);
+    for (uint8_t j = 0; j < NUM_COLS; j++) {
+      temp.data[pivotPosition][j] *= factor;
+      result.data[pivotPosition][j] *= factor;  // same operation on result matrix
+    }
+    // now for each row k (that isn't the pivot row)
+    // remove the multiple of the current pivot row that will make the element in the pivot column zero
+    for (uint8_t rowToZero = 0; rowToZero < NUM_ROWS; rowToZero++) {
+      if (rowToZero != pivotPosition) {
+        // minus (pivot row * [k][pivotPosition])
+        T rowFactor = temp.data[rowToZero][pivotPosition];
+        for (uint8_t j = 0; j < NUM_COLS; j++) {
+          temp.data[rowToZero][j] -= temp.data[pivotPosition][j] * rowFactor;
+          result.data[rowToZero][j] -= result.data[pivotPosition][j] * rowFactor;  // same operation on result matrix
+        }
+      }
+    }
+  }
+
+  // do column swaps (in reverse order) on result to reverse effect of row swaps
+  for (int8_t i = NUM_ROWS; i >= 0; i--) {
+    // if there was a swap
+    if (rowSwaps[i] = i) {
+      for (uint8_t j = 0; j < NUM_COLS; j++) {
+        tempSwapValue = result.data[i][j];
+        result.data[i][j] = result.data[rowSwaps[i]][j];
+        result.data[rowSwaps[i]][j] = tempSwapValue;
+      }
+    }
+  }
+
+  return result;
+}
+
+
+
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 void Matrix<T, NUM_ROWS, NUM_COLS>::print() {
   for (uint8_t i = 0; i < NUM_ROWS; i++) {
     for (uint8_t j = 0; j < NUM_COLS; j++) {
-      Serial.print(data[i][j]); Serial.print('\t');
+      Serial.print(data[i][j], 3); Serial.print('\t');
     }
     Serial.print('\n');
   }
@@ -240,14 +306,14 @@ template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_
     for (uint8_t j = 0; j < COLS_RIGHT; j++) { // each column in destination matrix
       T accumulator = 0;
       for (uint8_t k = 0; k < SHARED_DIMENSION; k++) {
-        accumulator += a(i,k) * b(k,j);
+        accumulator += a(i, k) * b(k, j);
       }
-      result(i,j) = accumulator;
+      result(i, j) = accumulator;
     }
   }
   return result;
-}
 
+}
 
 #endif
 
