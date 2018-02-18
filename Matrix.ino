@@ -104,54 +104,12 @@ void test() {
 
   L.print();
   L.inverse().print();
-  L.print();
-  L.inverseNEW().print();
 
   // And the following will fail to compile
   //  Matrix<float, 2, 2> J = A + B;  // assigning to incorrect result size
   //  Matrix<float, 3, 2> K = D * B;  // D.cols and B.rows don't match
 }
 
-void testNewInverse() {
-
-  Serial.println("L:");
-  for (uint8_t i = 0; i < 3; i++) {
-    for (uint8_t j = 0; j < 3; j++) {
-      L(i, j) = random(-100, 100) / 5.0f;
-    }
-  }
-  L.print();
-  L.inverse().print();
-  L.inverseNEW().print();
-
-  for (uint8_t i = 0; i < 3; i++) {
-    for (uint8_t j = 0; j < 3; j++) {
-      L(i, j) = random(-100, 100) / 5.0f;
-    }
-  }
-  L.print();
-  L.inverse().print();
-  L.inverseNEW().print();
-
-  for (uint8_t i = 0; i < 3; i++) {
-    for (uint8_t j = 0; j < 3; j++) {
-      L(i, j) = random(-100, 100) / 5.0f;
-    }
-  }
-  L.print();
-  L.inverse().print();
-  L.inverseNEW().print();
-
-  Matrix<float, 3, 3> X;
-  Serial.println(micros());
-  X = L.inverse();
-  Serial.println(micros());
-
-  Serial.println(micros());
-  X = L.inverseNEW();
-  Serial.println(micros());
-
-}
 
 
 void setup() {

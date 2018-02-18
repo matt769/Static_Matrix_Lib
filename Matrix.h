@@ -156,54 +156,8 @@ Matrix<T, NUM_COLS, NUM_ROWS> Matrix<T, NUM_ROWS, NUM_COLS>::transpose() {
 // for each column, make diagonal element 1, then makes the rest of the column zero
 // only operates on square matrix (will return zero matrix in size of original if not)
 // ideally make this enforced by the compiler
-// Need to add row swapping
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
-
-  Matrix<T, NUM_ROWS, NUM_COLS> result;
-  if (NUM_ROWS != NUM_COLS) {
-    operationFailure |= MATRIX_INVERSION_FAILURE;
-    return result;
-  }
-
-  result.identityInit();
-  Matrix<T, NUM_ROWS, NUM_COLS> temp = copy(); // not going to modify original matrix
-  for (uint8_t pivotPosition = 0; pivotPosition < NUM_ROWS; pivotPosition++) {
-    // want to use the row with the highest absolute value in the column of the current pivot
-    // this can help with numerical stability (avoiding under/overflow)
-    // TODO...
-
-    // first divide the row by the value at pivot to make pivot = 1
-    if (temp.data[pivotPosition][pivotPosition] == 0) {
-      operationFailure = true;
-      return result;
-    }
-    T factor = (T)1 / (temp.data[pivotPosition][pivotPosition]);
-    for (uint8_t j = 0; j < NUM_COLS; j++) {
-      temp.data[pivotPosition][j] *= factor;
-      result.data[pivotPosition][j] *= factor;  // same operation on result matrix
-    }
-    // now for each row k (that isn't the pivot row)
-    // remove the multiple of the current pivot row that will make the element in the pivot column zero
-    for (uint8_t rowToZero = 0; rowToZero < NUM_ROWS; rowToZero++) {
-      if (rowToZero != pivotPosition) {
-        // minus (pivot row * [k][pivotPosition])
-        T rowFactor = temp.data[rowToZero][pivotPosition];
-        for (uint8_t j = 0; j < NUM_COLS; j++) {
-          temp.data[rowToZero][j] -= temp.data[pivotPosition][j] * rowFactor;
-          result.data[rowToZero][j] -= result.data[pivotPosition][j] * rowFactor;  // same operation on result matrix
-        }
-      }
-    }
-  }
-  return result;
-}
-
-
-
-
-template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverseNEW() {
 
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   if (NUM_ROWS != NUM_COLS) {
