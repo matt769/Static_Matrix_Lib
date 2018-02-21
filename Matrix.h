@@ -13,9 +13,10 @@ class Matrix {
     void zeroInit();
     void identityInit();
     Matrix copy();
-    T getElement(const uint8_t row, const uint8_t col);
-    T getElementConst(const uint8_t row, const uint8_t col) const;  // for use in multiply function, does not set error flag
+    //    T getElement(const uint8_t row, const uint8_t col);
+    T getElement(const uint8_t row, const uint8_t col) const;  // for use in multiply function, does not set error flag
     T& setElement(const uint8_t row, const uint8_t col);
+    T& operator()(uint8_t row, uint8_t col);
     Matrix operator+(const Matrix& m);
     Matrix operator-(const Matrix& m);
     Matrix operator*(T scalar);
@@ -75,17 +76,13 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::copy() {
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-T Matrix<T, NUM_ROWS, NUM_COLS>::getElementConst(const uint8_t row, const uint8_t col) const {
-  if (row < NUM_ROWS && col < NUM_COLS) {
+T Matrix<T, NUM_ROWS, NUM_COLS>::getElement(const uint8_t row, const uint8_t col) const {
     return data[row][col];
-  }
-  else {
-    return boundsError;
-  }
 }
 
+
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-T Matrix<T, NUM_ROWS, NUM_COLS>::getElement(const uint8_t row, const uint8_t col) {
+T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(uint8_t row, uint8_t col) {
   if (row < NUM_ROWS && col < NUM_COLS) {
     return data[row][col];
   }
@@ -97,13 +94,7 @@ T Matrix<T, NUM_ROWS, NUM_COLS>::getElement(const uint8_t row, const uint8_t col
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 T& Matrix<T, NUM_ROWS, NUM_COLS>::setElement(uint8_t row, uint8_t col) {
-  if (row < NUM_ROWS && col < NUM_COLS) {
     return data[row][col];
-  }
-  else {
-    operationFailure |= MATRIX_INDEX_OUT_OF_RANGE;
-    return boundsError;
-  }
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
@@ -283,7 +274,7 @@ template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_
     for (uint8_t j = 0; j < COLS_RIGHT; j++) { // each column in destination matrix
       T accumulator = 0;
       for (uint8_t k = 0; k < SHARED_DIMENSION; k++) {
-        accumulator += a.getElementConst(i, k) * b.getElementConst(k, j);
+        accumulator += a.getElement(i, k) * b.getElement(k, j);
       }
       result.setElement(i, j) = accumulator;
     }

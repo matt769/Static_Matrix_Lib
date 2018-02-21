@@ -13,11 +13,11 @@ void test() {
   randomSeed(0);
 
   // Access matrix elements - NOTE indexes start at 0
-  float a = A.getElement(1, 2);
+  float a = A(1, 2);
   Serial.print("a: "); Serial.println(a);
-  A.setElement(2, 3) = 1.56f;
+  A(2, 3) = 1.56f;
   Serial.print("A error status: "); Serial.println(A.getErrorStatus()); // error status of 0 (no errors)
-  float b = A.getElement(100, 20); // trying to access outside the matrix
+  float b = A(100, 20); // trying to access outside the matrix
   Serial.print("A error status after out of range access: "); Serial.println(A.getErrorStatus()); // now we have error status of 1 (index out of range)
   Serial.print("b: "); Serial.println(b);
   A.print();
@@ -27,7 +27,7 @@ void test() {
   Serial.println("A:");
   for (uint8_t i = 0; i < 3; i++) {
     for (uint8_t j = 0; j < 4; j++) {
-      A.setElement(i, j) = random(-100, 100) / 5.0f;
+      A(i, j) = random(-100, 100) / 5.0f;
     }
   }
   A.print();
@@ -35,7 +35,7 @@ void test() {
   Serial.println("B:");
   for (uint8_t i = 0; i < 3; i++) {
     for (uint8_t j = 0; j < 4; j++) {
-      B.setElement(i, j) = random(-100, 100) / 5.0f;
+      B(i, j) = random(-100, 100) / 5.0f;
     }
   }
   B.print();
@@ -43,7 +43,7 @@ void test() {
   Serial.println("D:");
   for (uint8_t i = 0; i < 4; i++) {
     for (uint8_t j = 0; j < 2; j++) {
-      D.setElement(i, j) = random(-100, 100) / 5.0f;
+      D(i, j) = random(-100, 100) / 5.0f;
     }
   }
   D.print();
@@ -51,7 +51,7 @@ void test() {
   Serial.println("L:");
   for (uint8_t i = 0; i < 3; i++) {
     for (uint8_t j = 0; j < 3; j++) {
-      L.setElement(i, j) = random(-100, 100) / 5.0f;
+      L(i, j) = random(-100, 100) / 5.0f;
     }
   }
   L.print();
