@@ -13,10 +13,9 @@ class Matrix {
     void zeroInit();
     void identityInit();
     Matrix copy();
-    //    T getElement(const uint8_t row, const uint8_t col);
-    T getElement(const uint8_t row, const uint8_t col) const;  // for use in multiply function, does not set error flag
-    T& setElement(const uint8_t row, const uint8_t col);
-    T& operator()(uint8_t row, uint8_t col);
+    T getElement(const uint8_t row, const uint8_t col) const; // no bounds checking
+    T& setElement(const uint8_t row, const uint8_t col); // no bounds checking
+    T& operator()(const uint8_t row, const uint8_t col);
     Matrix operator+(const Matrix& m);
     Matrix operator-(const Matrix& m);
     Matrix operator*(T scalar);
@@ -24,7 +23,6 @@ class Matrix {
     Matrix operator-(T scalar);
     Matrix operator/(T scalar);
     Matrix inverse();
-    Matrix inverseNEW();
     Matrix<T, NUM_COLS, NUM_ROWS> transpose();
     uint8_t getErrorStatus();
     void print();
@@ -82,7 +80,7 @@ T Matrix<T, NUM_ROWS, NUM_COLS>::getElement(const uint8_t row, const uint8_t col
 
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(uint8_t row, uint8_t col) {
+T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(const uint8_t row, const uint8_t col) {
   if (row < NUM_ROWS && col < NUM_COLS) {
     return data[row][col];
   }
@@ -93,7 +91,7 @@ T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(uint8_t row, uint8_t col) {
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-T& Matrix<T, NUM_ROWS, NUM_COLS>::setElement(uint8_t row, uint8_t col) {
+T& Matrix<T, NUM_ROWS, NUM_COLS>::setElement(const uint8_t row, const uint8_t col) {
     return data[row][col];
 }
 
@@ -167,9 +165,9 @@ Matrix<T, NUM_COLS, NUM_ROWS> Matrix<T, NUM_ROWS, NUM_COLS>::transpose() {
 }
 
 // Gauss-Jordan method
-// for each column, make diagonal element 1, then makes the rest of the column zero
+// for each column, make diagonal element (the pivot) equal 1, then makes the rest of the column zero
 // only operates on square matrix (will return zero matrix in size of original if not)
-// ideally make this enforced by the compiler
+// the 'pivotrow' or 'pivotcolumn' if referred to is just the row/col of the current pivot point
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
 
@@ -183,9 +181,10 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
   Matrix<T, NUM_ROWS, NUM_COLS> temp = copy(); // not going to modify original matrix
   uint8_t rowSwaps[NUM_ROWS];
   T tempSwapValue;
+  // want to use the row with the highest absolute value in the column of the current pivot
+  // this can help with numerical stability (avoiding under/overflow)
+  // first find the row with the highest abs value
   for (uint8_t pivotPosition = 0; pivotPosition < NUM_ROWS; pivotPosition++) {
-    // want to use the row with the highest absolute value in the column of the current pivot
-    // this can help with numerical stability (avoiding under/overflow)
     uint8_t rowWithMaxValue = pivotPosition;
     T maxAbsValue = abs(temp.data[pivotPosition][pivotPosition]);
     for (uint8_t i = 0; i < NUM_ROWS; i++) {
@@ -196,20 +195,22 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
         }
       }
     }
+	// if it's not the current pivot row then we need to swap rows
     if (rowWithMaxValue != pivotPosition) {
-      // need to swap rows
       for (uint8_t j = 0; j < NUM_COLS; j++) {
         tempSwapValue = temp.data[rowWithMaxValue][j];
         temp.data[rowWithMaxValue][j] = temp.data[pivotPosition][j];
         temp.data[pivotPosition][j] = tempSwapValue;
+		// and we do this for the result matrix as well
         tempSwapValue = result.data[rowWithMaxValue][j];
         result.data[rowWithMaxValue][j] = result.data[pivotPosition][j];
         result.data[pivotPosition][j] = tempSwapValue;
       }
     }
-    rowSwaps[pivotPosition] = rowWithMaxValue;
+    rowSwaps[pivotPosition] = rowWithMaxValue; // record the swap even if none for easier reversal
 
-    // first divide the row by the value at pivot to make pivot = 1
+    // now divide the row by the value at pivot to make pivot = 1
+	// check for pivot = 0 first in which case can't invert
     if (temp.data[pivotPosition][pivotPosition] == 0) {
       operationFailure = true;
       return result;
@@ -219,7 +220,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
       temp.data[pivotPosition][j] *= factor;
       result.data[pivotPosition][j] *= factor;  // same operation on result matrix
     }
-    // now for each row k (that isn't the pivot row)
+    // now for each row (that isn't the pivot row)
     // remove the multiple of the current pivot row that will make the element in the pivot column zero
     for (uint8_t rowToZero = 0; rowToZero < NUM_ROWS; rowToZero++) {
       if (rowToZero != pivotPosition) {
@@ -233,7 +234,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
     }
   }
 
-  // do column swaps (in reverse order) on result to reverse effect of row swaps
+  // now do column swaps (in reverse order) on result to reverse effect of row swaps
   for (int8_t i = NUM_ROWS; i >= 0; i--) {
     // if there was a swap
     if (rowSwaps[i] == i) {
