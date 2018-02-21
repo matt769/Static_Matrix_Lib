@@ -12,17 +12,6 @@ Matrix<int, 2, 2> W;  // Declare a 2 row, 24 column matrix of integers
 void test() {
   randomSeed(0);
 
-  // Access matrix elements - NOTE indexes start at 0
-  float a = A(1, 2);
-  Serial.print("a: "); Serial.println(a);
-  A(2, 3) = 1.56f;
-  Serial.print("A error status: "); Serial.println(A.getErrorStatus()); // error status of 0 (no errors)
-  float b = A(100, 20); // trying to access outside the matrix
-  Serial.print("A error status after out of range access: "); Serial.println(A.getErrorStatus()); // now we have error status of 1 (index out of range)
-  Serial.print("b: "); Serial.println(b);
-  A.print();
-  Serial.println();
-
   // Populate base matrices
   Serial.println("A:");
   for (uint8_t i = 0; i < 3; i++) {
@@ -55,6 +44,18 @@ void test() {
     }
   }
   L.print();
+
+  // Access matrix elements - NOTE indexes start at 0
+  float a = A(1, 2);
+  Serial.print("a: "); Serial.println(a);
+  A(2, 3) = 1.56f;
+  Serial.print("A error status: "); Serial.println(A.getErrorStatus()); // error status of 0 (no errors)
+  float b = A(100, 20); // trying to access outside the matrix
+  Serial.print("A error status after out of range access: "); Serial.println(A.getErrorStatus()); // now we have error status of 1 (index out of range)
+  Serial.print("b: "); Serial.println(b);
+  A.print();
+  Serial.println();
+
 
   // Basic operations
   Serial.println("A + B");
@@ -119,7 +120,7 @@ void test() {
 
 void setup() {
   Serial.begin(230400);
-  delay(1000);
+  delay(2000);
 
   //  testNewInverse();
   test();
