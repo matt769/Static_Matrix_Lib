@@ -14,10 +14,13 @@ void test() {
 
   // Access matrix elements - NOTE indexes start at 0
   float a = A.getElement(1, 2);
+  Serial.print("a: "); Serial.println(a);
   A.setElement(2, 3) = 1.56f;
   Serial.print("A error status: "); Serial.println(A.getErrorStatus()); // error status of 0 (no errors)
   float b = A.getElement(100, 20); // trying to access outside the matrix
   Serial.print("A error status after out of range access: "); Serial.println(A.getErrorStatus()); // now we have error status of 1 (index out of range)
+  Serial.print("b: "); Serial.println(b);
+  A.print();
   Serial.println();
 
   // Populate base matrices
@@ -88,6 +91,7 @@ void test() {
   Serial.print("M error status after inversion attempt: ");
   Serial.println(M.getErrorStatus()); // error status of 2 (inversion error)
   // this means that the data in Minv will not be ok to use
+  Minv.print();
 
   Serial.print("D error status: ");
   Serial.println(D.getErrorStatus()); // error status of 0 (no errors)
@@ -95,6 +99,7 @@ void test() {
   Serial.print("D error status after inversion attempt: ");
   Serial.println(D.getErrorStatus()); // error status of 2 (inversion error)
   // this means that the data in Dinv will not be ok to use
+  Dinv.print();
 
   // Longer expressions
   Serial.println();
@@ -116,8 +121,8 @@ void setup() {
   Serial.begin(230400);
   delay(1000);
 
-//  testNewInverse();
-    test();
+  //  testNewInverse();
+  test();
 
 }
 

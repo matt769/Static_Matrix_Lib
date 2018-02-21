@@ -13,10 +13,9 @@ class Matrix {
     void zeroInit();
     void identityInit();
     Matrix copy();
-    //    T& operator()(uint8_t row, uint8_t col);
     T getElement(const uint8_t row, const uint8_t col);
-    T getElementConst(const uint8_t row, const uint8_t col) const;
-    T& setElement(uint8_t row, uint8_t col);
+    T getElementConst(const uint8_t row, const uint8_t col) const;  // for use in multiply function, does not set error flag
+    T& setElement(const uint8_t row, const uint8_t col);
     Matrix operator+(const Matrix& m);
     Matrix operator-(const Matrix& m);
     Matrix operator*(T scalar);
@@ -75,24 +74,12 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::copy() {
   return result;
 }
 
-//template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-//T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(uint8_t row, uint8_t col) {
-//  if (row < NUM_ROWS && col < NUM_COLS) {
-//    return data[row][col];
-//  }
-//  else {
-//    operationFailure |= MATRIX_INDEX_OUT_OF_RANGE;
-//    return boundsError;
-//  }
-//}
-
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 T Matrix<T, NUM_ROWS, NUM_COLS>::getElementConst(const uint8_t row, const uint8_t col) const {
   if (row < NUM_ROWS && col < NUM_COLS) {
     return data[row][col];
   }
   else {
-//    operationFailure |= MATRIX_INDEX_OUT_OF_RANGE;
     return boundsError;
   }
 }
