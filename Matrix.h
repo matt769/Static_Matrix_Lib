@@ -14,7 +14,8 @@ class Matrix {
     void identityInit();
     Matrix copy();
     //    T& operator()(uint8_t row, uint8_t col);
-    T getElement(const uint8_t row, const uint8_t col) const;
+    T getElement(const uint8_t row, const uint8_t col);
+    T getElementConst(const uint8_t row, const uint8_t col) const;
     T& setElement(uint8_t row, uint8_t col);
     Matrix operator+(const Matrix& m);
     Matrix operator-(const Matrix& m);
@@ -86,12 +87,23 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::copy() {
 //}
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-T Matrix<T, NUM_ROWS, NUM_COLS>::getElement(const uint8_t row, const uint8_t col) const {
+T Matrix<T, NUM_ROWS, NUM_COLS>::getElementConst(const uint8_t row, const uint8_t col) const {
   if (row < NUM_ROWS && col < NUM_COLS) {
     return data[row][col];
   }
   else {
-//        operationFailure |= MATRIX_INDEX_OUT_OF_RANGE;
+//    operationFailure |= MATRIX_INDEX_OUT_OF_RANGE;
+    return boundsError;
+  }
+}
+
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+T Matrix<T, NUM_ROWS, NUM_COLS>::getElement(const uint8_t row, const uint8_t col) {
+  if (row < NUM_ROWS && col < NUM_COLS) {
+    return data[row][col];
+  }
+  else {
+    operationFailure |= MATRIX_INDEX_OUT_OF_RANGE;
     return boundsError;
   }
 }
@@ -284,7 +296,7 @@ template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_
     for (uint8_t j = 0; j < COLS_RIGHT; j++) { // each column in destination matrix
       T accumulator = 0;
       for (uint8_t k = 0; k < SHARED_DIMENSION; k++) {
-        accumulator += a.getElement(i, k) * b.getElement(k, j);
+        accumulator += a.getElementConst(i, k) * b.getElementConst(k, j);
       }
       result.setElement(i, j) = accumulator;
     }
