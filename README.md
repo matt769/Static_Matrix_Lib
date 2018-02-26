@@ -22,8 +22,8 @@ Matrix<int, 5, 1> Z; // And a 5 element column vector of ints
 ### Populating and accessing elements
 ```C++
 A(2, 3) = 1.56f;	// set single element
-for (uint8_t i = 0; i < 2; i++) {	// set all elements
-  for (uint8_t j = 0; j < 3; j++) {
+for (uint8_t i = 0; i < A.rows(); i++) {	// set all elements
+  for (uint8_t j = 0; j < A.cols(); j++) {
     A(i, j) = random(-100, 100) / 5.0f;
   }
 }
