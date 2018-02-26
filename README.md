@@ -5,11 +5,11 @@ To allow easy and clear use of matrix operations, e.g. A * B. while keeping stat
 
 Also include protection against illegal operations e.g. a 3x3 + 2x2, and bounds checking when accessing data elements.
 
-There is an existing matrix library for Arduino [MatrixMath](https://playground.arduino.cc/Code/MatrixMath) which will perform matrix operations on 2D arrays, but it does not cover any of the points above except for static memory allocation and is not 'nice' to use i.e. the user must set up the underlying data structure, must specify the matrix dimensions in every function call and make sure that all operations and accesses are within bounds.
-
 This library uses a template class to support matrices of any size and numeric data type.
 Obviously there are serious limitations to the processing capacity of some microcontrollers e.g. 8-bit Atmega328P when it comes to doing a lot of floating point calculations so if speed is an issue then using matrices of floating point numbers may not be an appropriate approach (with any matrix library).
 I am currently using this on a Teensy 3.5 (120MHz with FP unit)  - an unoptimised 3x3 matrix inversion routine takes ~14us which is more than sufficient for my needs.
+
+There is an existing matrix library for Arduino [MatrixMath](https://playground.arduino.cc/Code/MatrixMath) which will perform matrix operations on 2D arrays, but it does not cover any of the points above except for static memory allocation and is not 'nice' to use i.e. the user must set up the underlying data structure, must specify the matrix dimensions in every function call and make sure that all operations and accesses are within bounds.
 
 ## Use of this library
 ### Setup
@@ -44,7 +44,7 @@ Matrix<float, 3, 3> P = N.inverse();
 The example sketch provided shows working examples of all operations.
 
 ### Catching errors
-The compiler will catch issues with dimensions in add, subtract and multiply matrix operations.
+The compiler will catch dimension errors in assignment, add, subtract and multiply matrix operations.
 e.g. 
 ```C++
 Matrix<float, 3, 4> A;
