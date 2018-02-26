@@ -14,32 +14,32 @@ void test() {
 
   // Populate base matrices
   Serial.println("A:");
-  for (uint8_t i = 0; i < 3; i++) {
-    for (uint8_t j = 0; j < 4; j++) {
+  for (uint8_t i = 0; i < A.rows(); i++) {
+    for (uint8_t j = 0; j < A.cols(); j++) {
       A(i, j) = random(-100, 100) / 5.0f;
     }
   }
   A.print();
 
   Serial.println("B:");
-  for (uint8_t i = 0; i < 3; i++) {
-    for (uint8_t j = 0; j < 4; j++) {
+  for (uint8_t i = 0; i < B.rows(); i++) {
+    for (uint8_t j = 0; j < B.cols(); j++) {
       B(i, j) = random(-100, 100) / 5.0f;
     }
   }
   B.print();
 
   Serial.println("D:");
-  for (uint8_t i = 0; i < 4; i++) {
-    for (uint8_t j = 0; j < 2; j++) {
+  for (uint8_t i = 0; i < D.rows(); i++) {
+    for (uint8_t j = 0; j < D.cols(); j++) {
       D(i, j) = random(-100, 100) / 5.0f;
     }
   }
   D.print();
 
   Serial.println("L:");
-  for (uint8_t i = 0; i < 3; i++) {
-    for (uint8_t j = 0; j < 3; j++) {
+  for (uint8_t i = 0; i < L.rows(); i++) {
+    for (uint8_t j = 0; j < L.cols(); j++) {
       L(i, j) = random(-100, 100) / 5.0f;
     }
   }

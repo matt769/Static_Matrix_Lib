@@ -10,12 +10,15 @@ template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 class Matrix {
   public:
     Matrix();
+	Matrix(const Matrix& copy);
     void zeroInit();
     void identityInit();
     Matrix copy();
     T getElement(const uint8_t row, const uint8_t col) const; // no bounds checking
     T& setElement(const uint8_t row, const uint8_t col); // no bounds checking
     T& operator()(const uint8_t row, const uint8_t col);
+	uint8_t rows();
+	uint8_t cols();
     Matrix operator+(const Matrix& m);
     Matrix operator-(const Matrix& m);
     Matrix operator*(T scalar);
@@ -28,6 +31,8 @@ class Matrix {
     void print();
 
   private:
+  	uint8_t numRows;
+	uint8_t numCols;
     uint8_t operationFailure;
     union {
       T data[NUM_ROWS][NUM_COLS];
@@ -37,7 +42,9 @@ class Matrix {
 };
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-Matrix<T, NUM_ROWS, NUM_COLS>::Matrix() {
+Matrix<T, NUM_ROWS, NUM_COLS>::Matrix()
+	: numRows(NUM_ROWS), numCols(NUM_COLS)
+ {
   zeroInit();
   operationFailure = false;
   boundsError = -1;
@@ -94,6 +101,17 @@ template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 T& Matrix<T, NUM_ROWS, NUM_COLS>::setElement(const uint8_t row, const uint8_t col) {
     return data[row][col];
 }
+
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+uint8_t Matrix<T, NUM_ROWS, NUM_COLS>::rows() {
+	return numRows;
+}
+
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+uint8_t Matrix<T, NUM_ROWS, NUM_COLS>::cols() {
+	return numCols;
+}
+
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator+(const Matrix<T, NUM_ROWS, NUM_COLS> &m) {

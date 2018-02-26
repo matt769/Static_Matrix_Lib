@@ -61,7 +61,7 @@ Matrix<float, 3, 4> A;
 A(100, 20) = 4.3f;	// out of bounds, no compile error
 float a = A(20, 100);	// out of bounds, no compile error
 ```
-It will not cause a compiler error but the error flag associated with the matrix can be checked to see if there were any out of bounds operations attempted.
+It will not cause a compiler error but the directed memory will not be accessed and the error flag associated with the matrix can be checked to see if there were any out of bounds operations attempted. Any data returned should not be used.
 ```C++
 A.getErrorStatus(); // will now have an error status of 1 (index out of range)
 ```
