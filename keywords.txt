@@ -1,0 +1,32 @@
+#######################################
+# Syntax Coloring Map For Matrix Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Matrix	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+zeroInit	KEYWORD2
+identityInit	KEYWORD2
+copy	KEYWORD2
+getElement	KEYWORD2
+setElement	KEYWORD2
+rows	KEYWORD2
+cols	KEYWORD2
+transpose	KEYWORD2
+inverse	KEYWORD2
+getErrorStatus	KEYWORD2
+print	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MATRIX_INDEX_OUT_OF_RANGE	LITERAL1
+MATRIX_INVERSION_FAILURE	LITERAL1
