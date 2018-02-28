@@ -10,29 +10,28 @@ template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 class Matrix {
   public:
     Matrix();
-	Matrix(const Matrix& copy);
     void zeroInit();
     void identityInit();
     Matrix copy();
     T getElement(const uint8_t row, const uint8_t col) const; // no bounds checking
     T& setElement(const uint8_t row, const uint8_t col); // no bounds checking
     T& operator()(const uint8_t row, const uint8_t col);
-	uint8_t rows();
-	uint8_t cols();
+    uint8_t rows();
+    uint8_t cols();
     Matrix operator+(const Matrix& m);
     Matrix operator-(const Matrix& m);
     Matrix operator*(T scalar);
     Matrix operator+(T scalar);
     Matrix operator-(T scalar);
     Matrix operator/(T scalar);
-    Matrix inverse();
     Matrix<T, NUM_COLS, NUM_ROWS> transpose();
+    Matrix inverse();
     uint8_t getErrorStatus();
     void print();
 
   private:
-  	uint8_t numRows;
-	uint8_t numCols;
+    uint8_t numRows;
+    uint8_t numCols;
     uint8_t operationFailure;
     union {
       T data[NUM_ROWS][NUM_COLS];
@@ -43,8 +42,8 @@ class Matrix {
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS>::Matrix()
-	: numRows(NUM_ROWS), numCols(NUM_COLS)
- {
+  : numRows(NUM_ROWS), numCols(NUM_COLS)
+{
   zeroInit();
   operationFailure = false;
   boundsError = -1;
@@ -82,9 +81,13 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::copy() {
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 T Matrix<T, NUM_ROWS, NUM_COLS>::getElement(const uint8_t row, const uint8_t col) const {
-    return data[row][col];
+  return data[row][col];
 }
 
+template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
+T& Matrix<T, NUM_ROWS, NUM_COLS>::setElement(const uint8_t row, const uint8_t col) {
+  return data[row][col];
+}
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(const uint8_t row, const uint8_t col) {
@@ -98,18 +101,13 @@ T& Matrix<T, NUM_ROWS, NUM_COLS>::operator()(const uint8_t row, const uint8_t co
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-T& Matrix<T, NUM_ROWS, NUM_COLS>::setElement(const uint8_t row, const uint8_t col) {
-    return data[row][col];
-}
-
-template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 uint8_t Matrix<T, NUM_ROWS, NUM_COLS>::rows() {
-	return numRows;
+  return numRows;
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 uint8_t Matrix<T, NUM_ROWS, NUM_COLS>::cols() {
-	return numCols;
+  return numCols;
 }
 
 
@@ -213,13 +211,13 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
         }
       }
     }
-	// if it's not the current pivot row then we need to swap rows
+    // if it's not the current pivot row then we need to swap rows
     if (rowWithMaxValue != pivotPosition) {
       for (uint8_t j = 0; j < NUM_COLS; j++) {
         tempSwapValue = temp.data[rowWithMaxValue][j];
         temp.data[rowWithMaxValue][j] = temp.data[pivotPosition][j];
         temp.data[pivotPosition][j] = tempSwapValue;
-		// and we do this for the result matrix as well
+        // and we do this for the result matrix as well
         tempSwapValue = result.data[rowWithMaxValue][j];
         result.data[rowWithMaxValue][j] = result.data[pivotPosition][j];
         result.data[pivotPosition][j] = tempSwapValue;
@@ -228,7 +226,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
     rowSwaps[pivotPosition] = rowWithMaxValue; // record the swap even if none for easier reversal
 
     // now divide the row by the value at pivot to make pivot = 1
-	// check for pivot = 0 first in which case can't invert
+    // check for pivot = 0 first in which case can't invert
     if (temp.data[pivotPosition][pivotPosition] == 0) {
       operationFailure = true;
       return result;
@@ -267,8 +265,6 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
   return result;
 }
 
-
-
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 void Matrix<T, NUM_ROWS, NUM_COLS>::print() {
   for (uint8_t i = 0; i < NUM_ROWS; i++) {
@@ -285,7 +281,6 @@ uint8_t Matrix<T, NUM_ROWS, NUM_COLS>::getErrorStatus() {
   return operationFailure;
 }
 
-
 // NOT A MEMBER FUNCTION
 template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_RIGHT> Matrix<T, ROWS_LEFT, COLS_RIGHT> operator*(const Matrix<T, ROWS_LEFT, SHARED_DIMENSION> & a, const Matrix<T, SHARED_DIMENSION, COLS_RIGHT> & b) {
   Matrix<T, ROWS_LEFT, COLS_RIGHT> result;
@@ -299,7 +294,6 @@ template <typename T, uint8_t ROWS_LEFT, uint8_t SHARED_DIMENSION, uint8_t COLS_
     }
   }
   return result;
-
 }
 
 #endif
