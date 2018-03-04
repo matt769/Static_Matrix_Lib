@@ -184,9 +184,10 @@ Matrix<T, NUM_COLS, NUM_ROWS> Matrix<T, NUM_ROWS, NUM_COLS>::transpose() {
 // for each column, make diagonal element (the pivot) equal 1, then makes the rest of the column zero
 // only operates on square matrix (will return zero matrix in size of original if not)
 // the 'pivotrow' or 'pivotcolumn' if referred to is just the row/col of the current pivot point
+// identical operations are performed on an identity matrix - the final result will be the inverse of the input matrix
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
 Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
-
+  // check the input matrix is square
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   if (NUM_ROWS != NUM_COLS) {
     operationFailure |= MATRIX_INVERSION_FAILURE;
@@ -197,10 +198,9 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::inverse() {
   Matrix<T, NUM_ROWS, NUM_COLS> temp = copy(); // not going to modify original matrix
   uint8_t rowSwaps[NUM_ROWS];
   T tempSwapValue;
-  // want to use the row with the highest absolute value in the column of the current pivot
-  // this can help with numerical stability (avoiding under/overflow)
-  // first find the row with the highest abs value
   for (uint8_t pivotPosition = 0; pivotPosition < NUM_ROWS; pivotPosition++) {
+    // find the row with the highest absolute value in the column of the current pivot
+    // this can help with numerical stability (avoiding under/overflow)
     uint8_t rowWithMaxValue = pivotPosition;
     T maxAbsValue = abs(temp.data[pivotPosition][pivotPosition]);
     for (uint8_t i = 0; i < NUM_ROWS; i++) {
