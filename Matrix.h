@@ -20,10 +20,10 @@ class Matrix {
     uint8_t cols();
     Matrix operator+(const Matrix& m);
     Matrix operator-(const Matrix& m);
-    Matrix operator*(T scalar);
-    Matrix operator+(T scalar);
-    Matrix operator-(T scalar);
-    Matrix operator/(T scalar);
+    Matrix operator*(const T scalar);
+    Matrix operator+(const T scalar);
+    Matrix operator-(const T scalar);
+    Matrix operator/(const T scalar);
     Matrix<T, NUM_COLS, NUM_ROWS> transpose();
     Matrix inverse();
     uint8_t getErrorStatus();
@@ -134,7 +134,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator-(const Mat
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator*(T scalar) {
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator*(const T scalar) {
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
     result.flat[i] = flat[i] * scalar;
@@ -143,7 +143,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator*(T scalar)
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator+(T scalar) {
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator+(const T scalar) {
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
     result.flat[i] = flat[i] + scalar;
@@ -152,7 +152,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator+(T scalar)
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator-(T scalar) {
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator-(const T scalar) {
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
     result.flat[i] = flat[i] - scalar;
@@ -161,7 +161,7 @@ Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator-(T scalar)
 }
 
 template <typename T, uint8_t NUM_ROWS, uint8_t NUM_COLS>
-Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator/(T scalar) {
+Matrix<T, NUM_ROWS, NUM_COLS> Matrix<T, NUM_ROWS, NUM_COLS>::operator/(const T scalar) {
   Matrix<T, NUM_ROWS, NUM_COLS> result;
   for (uint8_t i = 0; i < NUM_ROWS * NUM_COLS; i++) {
     result.flat[i] = flat[i] / scalar;
